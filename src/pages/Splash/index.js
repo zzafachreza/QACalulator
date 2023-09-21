@@ -83,13 +83,13 @@ export default function Splash({ navigation }) {
           color: colors.primary,
           fontFamily: fonts.secondary[600],
           fontSize: windowWidth / 17,
-        }}>Quality Assurance and GHV</Text>
+        }}>Calculator of Quality Assurance</Text>
         <Text style={{
           color: colors.secondary,
           fontFamily: fonts.secondary[600],
           fontSize: windowWidth / 17,
           marginBottom: 20,
-        }}>of Natural Gas Calculator</Text>
+        }}>and GHV in Natural Gas</Text>
 
         <ActivityIndicator size="large" color={colors.secondary} />
         <Text style={{

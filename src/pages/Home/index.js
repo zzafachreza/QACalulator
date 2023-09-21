@@ -42,113 +42,113 @@ export default function Home({ navigation }) {
     value1: 0,
     value2: 0
   })
-  // const [data, setData] = useState([
-  //   {
-  //     label: 'CH4',
-  //     value1: 0,
-  //     value2: 0
-  //   },
-  //   {
-  //     label: 'CO2',
-  //     value1: 0,
-  //     value2: 0
-  //   },
-  //   {
-  //     label: 'N2',
-  //     value1: 0,
-  //     value2: 0
-  //   },
-  //   {
-  //     label: 'C2H6',
-  //     value1: 0,
-  //     value2: 0
-  //   },
-  //   {
-  //     label: 'C3H8',
-  //     value1: 0,
-  //     value2: 0
-  //   },
-  //   {
-  //     label: 'i C4H10',
-  //     value1: 0,
-  //     value2: 0
-  //   },
-  //   {
-  //     label: 'n C4H10',
-  //     value1: 0,
-  //     value2: 0
-  //   },
-  //   {
-  //     label: 'i C5H12',
-  //     value1: 0,
-  //     value2: 0
-  //   },
-  //   {
-  //     label: 'n C5H12',
-  //     value1: 0,
-  //     value2: 0
-  //   },
-  //   {
-  //     label: 'C6 +',
-  //     value1: 0,
-  //     value2: 0
-  //   },
-
-  // ]);
-
   const [data, setData] = useState([
     {
       label: 'CH4',
-      value1: 91.593,
-      value2: 91.567
+      value1: 0,
+      value2: 0
     },
     {
       label: 'CO2',
-      value1: 3.243,
-      value2: 3.248
+      value1: 0,
+      value2: 0
     },
     {
       label: 'N2',
-      value1: 0.05,
-      value2: 0.049
+      value1: 0,
+      value2: 0
     },
     {
       label: 'C2H6',
-      value1: 2.24,
-      value2: 2.239
+      value1: 0,
+      value2: 0
     },
     {
       label: 'C3H8',
-      value1: 1.529,
-      value2: 1.533
+      value1: 0,
+      value2: 0
     },
     {
       label: 'i C4H10',
-      value1: 0.339,
-      value2: 0.344
+      value1: 0,
+      value2: 0
     },
     {
       label: 'n C4H10',
-      value1: 0.42,
-      value2: 0.428
+      value1: 0,
+      value2: 0
     },
     {
       label: 'i C5H12',
-      value1: 0.177,
-      value2: 0.175
+      value1: 0,
+      value2: 0
     },
     {
       label: 'n C5H12',
-      value1: 0.126,
-      value2: 0.129
+      value1: 0,
+      value2: 0
     },
     {
       label: 'C6 +',
-      value1: 0.283,
-      value2: 0.288
+      value1: 0,
+      value2: 0
     },
 
-  ])
+  ]);
+
+  // const [data, setData] = useState([
+  //   {
+  //     label: 'CH4',
+  //     value1: 91.593,
+  //     value2: 91.567
+  //   },
+  //   {
+  //     label: 'CO2',
+  //     value1: 3.243,
+  //     value2: 3.248
+  //   },
+  //   {
+  //     label: 'N2',
+  //     value1: 0.05,
+  //     value2: 0.049
+  //   },
+  //   {
+  //     label: 'C2H6',
+  //     value1: 2.24,
+  //     value2: 2.239
+  //   },
+  //   {
+  //     label: 'C3H8',
+  //     value1: 1.529,
+  //     value2: 1.533
+  //   },
+  //   {
+  //     label: 'i C4H10',
+  //     value1: 0.339,
+  //     value2: 0.344
+  //   },
+  //   {
+  //     label: 'n C4H10',
+  //     value1: 0.42,
+  //     value2: 0.428
+  //   },
+  //   {
+  //     label: 'i C5H12',
+  //     value1: 0.177,
+  //     value2: 0.175
+  //   },
+  //   {
+  //     label: 'n C5H12',
+  //     value1: 0.126,
+  //     value2: 0.129
+  //   },
+  //   {
+  //     label: 'C6 +',
+  //     value1: 0.283,
+  //     value2: 0.288
+  //   },
+
+  // ])
 
   const BI_OF_AIR = 0.00537;
   const Z_AIR = 1 - (Math.pow(BI_OF_AIR, 2)) * PSIA;
@@ -250,10 +250,10 @@ export default function Home({ navigation }) {
             }}>Welcome, {user.nama_lengkap}</Text>
             <Text style={{
               fontFamily: fonts.secondary[600],
-              fontSize: windowWidth / 20,
+              fontSize: windowWidth / 30,
               color: colors.white
             }}>
-              Quality Assurance and GHV of Natural Gas Calculator
+              Calculator of Groos Heat Value, Compressibility, and Relative Density in Natural Gas
             </Text>
           </View>
 
@@ -292,7 +292,14 @@ export default function Home({ navigation }) {
         padding: 10,
       }}>
 
-
+        <Text style={{
+          textAlign: 'center',
+          fontFamily: fonts.secondary[600],
+          color: colors.border,
+          fontSize: windowWidth / 25
+        }}>
+          Calculation Base on GPA 2172 - 19
+        </Text>
 
         <View style={{
           paddingVertical: 10,
@@ -342,7 +349,7 @@ export default function Home({ navigation }) {
               paddingHorizontal: 0,
               borderRadius: 10,
               textAlign: 'center'
-            }}>Repeatibility {'\n'}Test</Text>
+            }}>Repeatibility {'\n'}Test of Natural Gas</Text>
 
           </View>
           <View style={{
@@ -358,7 +365,7 @@ export default function Home({ navigation }) {
               paddingHorizontal: 0,
               borderRadius: 10,
               textAlign: 'center'
-            }}>Reproducibility{'\n'}Test</Text>
+            }}>Reproducibility{'\n'}Test of Natural Gas</Text>
           </View>
 
 
@@ -562,6 +569,11 @@ export default function Home({ navigation }) {
               <TextInput value={PSIA.toString()} keyboardType='number-pad' style={{
                 backgroundColor: colors.tertiary, fontFamily: fonts.secondary[600], fontSize: 15, textAlign: 'center'
               }} />
+              <Text style={{
+                fontFamily: fonts.secondary[400],
+                fontSize: 10,
+                color: colors.black
+              }}>Pressure Base according SE DITJEN MIGAS No: 1999/18.06/DMT/2013 at 14.73 psia</Text>
             </View>
           </View>
         </View>
@@ -688,12 +700,6 @@ export default function Home({ navigation }) {
 
 
         <MyGap jarak={50} />
-        <Text style={{
-          textAlign: 'center',
-          fontFamily: fonts.secondary[600],
-          color: colors.border,
-          margin: 5,
-        }}>Base on ASTM D-2161 & ASTM D-2270</Text>
 
         <Text style={{
           textAlign: 'center',

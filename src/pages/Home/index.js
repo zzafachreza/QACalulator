@@ -1,4 +1,4 @@
-import { Alert, StyleSheet, Text, View, Image, TextInput } from 'react-native'
+import { Alert, StyleSheet, Text, View, Image, TextInput, BackHandler } from 'react-native'
 import React, { useState, useEffect } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { apiURL, getData, storeData } from '../../utils/localStorage';
@@ -10,10 +10,66 @@ import { Icon } from 'react-native-elements/dist/icons/Icon';
 import { MyButton, MyGap, MyInput } from '../../components';
 import { useIsFocused } from '@react-navigation/native';
 import axios from 'axios';
+import { ActivityIndicator } from 'react-native';
 
 export default function Home({ navigation }) {
+  const [mulai, setMulai] = useState(false);
+  const [loading, setLoading] = useState(false);
   const isFocused = useIsFocused();
   const [user, setUser] = useState({});
+  const NULL_DATA = [
+    {
+      label: 'CH4',
+      value1: 0,
+      value2: 0
+    },
+    {
+      label: 'CO2',
+      value1: 0,
+      value2: 0
+    },
+    {
+      label: 'N2',
+      value1: 0,
+      value2: 0
+    },
+    {
+      label: 'C2H6',
+      value1: 0,
+      value2: 0
+    },
+    {
+      label: 'C3H8',
+      value1: 0,
+      value2: 0
+    },
+    {
+      label: 'i C4H10',
+      value1: 0,
+      value2: 0
+    },
+    {
+      label: 'n C4H10',
+      value1: 0,
+      value2: 0
+    },
+    {
+      label: 'i C5H12',
+      value1: 0,
+      value2: 0
+    },
+    {
+      label: 'n C5H12',
+      value1: 0,
+      value2: 0
+    },
+    {
+      label: 'C6 +',
+      value1: 0,
+      value2: 0
+    },
+
+  ]
   const [PSIA, setPSIA] = useState(14.73);
   const HVI_ID = [1010.0, 0, 0, 1769.70, 2516.10, 3251.90, 3262.30, 4000.90, 4008.70, 5129.22];
   const GI_BI = [0.55390, 1.51950, 0.96720, 1.03820, 1.52250, 2.00680, 2.00680, 2.49110, 2.49110, 3.21755];
@@ -154,6 +210,7 @@ export default function Home({ navigation }) {
   const Z_AIR = 1 - (Math.pow(BI_OF_AIR, 2)) * PSIA;
 
   const __calculate = () => {
+    setLoading(true);
 
     // XIbi V1
     let Xibi_v1 = 0;
@@ -204,6 +261,11 @@ export default function Home({ navigation }) {
       value2: (xiGiid_v2 * Z_AIR / (1 - (PSIA * Math.pow(Xibi_v2, 2)))).toFixed(4)
     })
 
+    setTimeout(() => {
+      setMulai(true);
+      setLoading(false)
+    }, 1200)
+
   }
 
 
@@ -211,9 +273,42 @@ export default function Home({ navigation }) {
   useEffect(() => {
 
 
+    const backAction = () => {
+      Alert.alert('Hold on!', 'Are you sure you want to go back?', [
+        {
+          text: 'Cancel',
+
+
+        },
+        {
+          text: 'Exit App',
+          onPress: () => BackHandler.exitApp(),
+
+        },
+        {
+          text: 'Re-Calculate', onPress: () => {
+            setMulai(false);
+            setData(NULL_DATA)
+          }
+        },
+      ]);
+      return true;
+    };
+
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      backAction,
+    );
+
+
+
+
     getData('user').then(res => {
       setUser(res);
     })
+
+
+    return () => backHandler.remove();
   }
     , []);
 
@@ -252,9 +347,7 @@ export default function Home({ navigation }) {
               fontFamily: fonts.secondary[600],
               fontSize: windowWidth / 30,
               color: colors.white
-            }}>
-              Calculator of Groos Heat Value, Compressibility, and Relative Density in Natural Gas
-            </Text>
+            }}>Calculator of Gross Heat Value, Compressibility, Relative Density, Repeatybility Test, and Reproducibility Test of Natural Gas</Text>
           </View>
 
 
@@ -298,7 +391,7 @@ export default function Home({ navigation }) {
           color: colors.border,
           fontSize: windowWidth / 25
         }}>
-          Calculation Base on GPA 2172 - 19
+          Base on GPA 2172 - 19 and GPA 2261-20
         </Text>
 
         <View style={{
@@ -306,397 +399,676 @@ export default function Home({ navigation }) {
           flexDirection: 'row',
           justifyContent: 'space-around'
         }}>
-          <View style={{
-            flex: 1,
-            marginRight: 2,
-            backgroundColor: colors.white
-          }}>
-            <Text style={{
-              fontFamily: fonts.secondary[600],
-              fontSize: 12,
-              color: colors.black,
+          {!mulai && <>
+            <View style={{
+              flex: 1,
+              marginRight: 2,
+              backgroundColor: colors.white
+            }}>
+              <Text style={{
+                fontFamily: fonts.secondary[600],
+                fontSize: 12,
+                color: colors.black,
 
-              borderRadius: 10,
-              textAlign: 'center'
-            }}>Result 1{'\n'}(% Mol)</Text>
-          </View>
-          <View style={{
-            marginLeft: 2,
-            marginRight: 2,
-            flex: 1,
-          }}>
-            <Text style={{
-              fontFamily: fonts.secondary[600],
-              fontSize: 12,
-              color: colors.black,
+                borderRadius: 10,
+                textAlign: 'center'
+              }}>Result 1{'\n'}(% Mol)</Text>
+            </View>
+            <View style={{
+              marginLeft: 2,
+              marginRight: 2,
+              flex: 1,
+            }}>
+              <Text style={{
+                fontFamily: fonts.secondary[600],
+                fontSize: 12,
+                color: colors.black,
 
-              borderRadius: 10,
-              textAlign: 'center'
-            }}>Result 2{'\n'}(% Mol)</Text>
-          </View>
+                borderRadius: 10,
+                textAlign: 'center'
+              }}>Result 2{'\n'}(% Mol)</Text>
+            </View>
+          </>}
 
-          <View style={{
-            flex: 1,
-            marginLeft: 2,
-            marginRight: 2,
-            justifyContent: 'center',
-            alignItems: 'center'
-          }}>
-            <Text style={{
-              fontFamily: fonts.secondary[600],
-              fontSize: 12,
-              color: colors.black,
-              paddingHorizontal: 0,
-              borderRadius: 10,
-              textAlign: 'center'
-            }}>Repeatibility {'\n'}Test of Natural Gas</Text>
+          {mulai && <>
 
-          </View>
-          <View style={{
-            flex: 1,
-            marginLeft: 2,
-            justifyContent: 'center',
-            alignItems: 'center'
-          }}>
-            <Text style={{
-              fontFamily: fonts.secondary[600],
-              fontSize: 12,
-              color: colors.black,
-              paddingHorizontal: 0,
-              borderRadius: 10,
-              textAlign: 'center'
-            }}>Reproducibility{'\n'}Test of Natural Gas</Text>
-          </View>
+            <View style={{
+              flex: 1,
+              marginLeft: 2,
+              marginRight: 2,
+              justifyContent: 'center',
+              alignItems: 'center'
+            }}>
+              <Text style={{
+                fontFamily: fonts.secondary[600],
+                fontSize: 12,
+                color: colors.black,
+                paddingHorizontal: 0,
+                borderRadius: 10,
+                textAlign: 'center'
+              }}>Repeatibility {'\n'}Test of Natural Gas</Text>
+
+            </View>
+            <View style={{
+              flex: 1,
+              marginLeft: 2,
+              justifyContent: 'center',
+              alignItems: 'center'
+            }}>
+              <Text style={{
+                fontFamily: fonts.secondary[600],
+                fontSize: 12,
+                color: colors.black,
+                paddingHorizontal: 0,
+                borderRadius: 10,
+                textAlign: 'center'
+              }}>Reproducibility{'\n'}Test of Natural Gas</Text>
+            </View>
+          </>}
 
 
         </View>
         {data.map((item, index) => {
 
-          let avg = ((item.value1 + item.value2) / 2).toFixed(3);
-          let dev = Math.abs(item.value1 - item.value2).toFixed(3);
+          let avg = ((parseFloat(item.value1) + parseFloat(item.value2)) / 2).toFixed(3);
+          let dev = Math.abs(parseFloat(item.value1) - parseFloat(item.value2)).toFixed(3);
           let v1_limit = 0;
           let v2_limit = 0;
           let v1_status = '';
           let v2_status = '';
+
           if ((index + 1) == 1) {
             v1_limit = (0.0079 * (Math.pow(avg, (1 / 3)))).toFixed(3);
             v2_limit = (91000 * (Math.pow(avg, -3))).toFixed(3);
-            v1_status = dev <= v1_limit ? 'PASS' : 'FAILED';
-            v2_status = dev <= v2_limit ? 'PASS' : 'FAILED';
+            v1_status = dev < v1_limit ? 'PASS' : 'FAILED';
+            v2_status = dev < v2_limit ? 'PASS' : 'FAILED';
+
           } else if ((index + 1) == 2) {
             v1_limit = (0.039 * (Math.pow(avg, (1 / 4)))).toFixed(3);
             v2_limit = (0.158 * (Math.pow(avg, (1 / 2)))).toFixed(3);
-            v1_status = dev <= v1_limit ? 'PASS' : 'FAILED';
-            v2_status = dev <= v2_limit ? 'PASS' : 'FAILED';
+            v1_status = dev < v1_limit ? 'PASS' : 'FAILED';
+            v2_status = dev < v2_limit ? 'PASS' : 'FAILED';
           } else if ((index + 1) == 3) {
             v1_limit = (0.0042 * (Math.pow(avg, (1 / 3)))).toFixed(3);
             v2_limit = (0.12 * (Math.pow(avg, (1 / 3)))).toFixed(3);
-            v1_status = dev <= v1_limit ? 'PASS' : 'FAILED';
-            v2_status = dev <= v2_limit ? 'PASS' : 'FAILED';
+            v1_status = dev < v1_limit ? 'PASS' : 'FAILED';
+            v2_status = dev < v2_limit ? 'PASS' : 'FAILED';
           } else if ((index + 1) == 4) {
             v1_limit = (0.0124 * (Math.pow(avg, (1 / 3)))).toFixed(3);
             v2_limit = (0.0315 * (Math.pow(avg, (1 / 3)))).toFixed(3);
-            v1_status = dev <= v1_limit ? 'PASS' : 'FAILED';
-            v2_status = dev <= v2_limit ? 'PASS' : 'FAILED';
+            v1_status = dev < v1_limit ? 'PASS' : 'FAILED';
+            v2_status = dev < v2_limit ? 'PASS' : 'FAILED';
           } else if ((index + 1) == 5) {
             v1_limit = (0.0084 * (Math.pow(avg, (1 / 8)))).toFixed(3);
             v2_limit = (0.026 * (Math.pow(avg, (1 / 2)))).toFixed(3);
-            v1_status = dev <= v1_limit ? 'PASS' : 'FAILED';
-            v2_status = dev <= v2_limit ? 'PASS' : 'FAILED';
+            v1_status = dev < v1_limit ? 'PASS' : 'FAILED';
+            v2_status = dev < v2_limit ? 'PASS' : 'FAILED';
           } else if ((index + 1) == 6) {
             v1_limit = (0.01 * (Math.pow(avg, (1 / 5)))).toFixed(3);
             v2_limit = (0.018 * (Math.pow(avg, (1 / 2)))).toFixed(3);
-            v1_status = dev <= v1_limit ? 'PASS' : 'FAILED';
-            v2_status = dev <= v2_limit ? 'PASS' : 'FAILED';
+            v1_status = dev < v1_limit ? 'PASS' : 'FAILED';
+            v2_status = dev < v2_limit ? 'PASS' : 'FAILED';
           } else if ((index + 1) == 7) {
             v1_limit = (0.0117 * (Math.pow(avg, (2 / 5)))).toFixed(3);
             v2_limit = (0.033 * (Math.pow(avg, (1 / 2)))).toFixed(3);
-            v1_status = dev <= v1_limit ? 'PASS' : 'FAILED';
-            v2_status = dev <= v2_limit ? 'PASS' : 'FAILED';
+            v1_status = dev < v1_limit ? 'PASS' : 'FAILED';
+            v2_status = dev < v2_limit ? 'PASS' : 'FAILED';
           } else if ((index + 1) == 8) {
             v1_limit = (0.009 * (Math.pow(avg, (1 / 4)))).toFixed(3);
             v2_limit = (0.025 * (Math.pow(avg, (1 / 4)))).toFixed(3);
-            v1_status = dev <= v1_limit ? 'PASS' : 'FAILED';
-            v2_status = dev <= v2_limit ? 'PASS' : 'FAILED';
+            v1_status = dev < v1_limit ? 'PASS' : 'FAILED';
+            v2_status = dev < v2_limit ? 'PASS' : 'FAILED';
           } else if ((index + 1) == 9) {
             v1_limit = (0.01 * (Math.pow(avg, (1 / 5)))).toFixed(3);
             v2_limit = (0.026 * (Math.pow(avg, (1 / 3)))).toFixed(3);
-            v1_status = dev <= v1_limit ? 'PASS' : 'FAILED';
-            v2_status = dev <= v2_limit ? 'PASS' : 'FAILED';
+            v1_status = dev < v1_limit ? 'PASS' : 'FAILED';
+            v2_status = dev < v2_limit ? 'PASS' : 'FAILED';
           } else if ((index + 1) == 10) {
             v1_limit = (0.0135 * (Math.pow(avg, (1 / 4)))).toFixed(3);
             v2_limit = (0.051 * (Math.pow(avg, (1 / 2)))).toFixed(3);
-            v1_status = dev <= v1_limit ? 'PASS' : 'FAILED';
-            v2_status = dev <= v2_limit ? 'PASS' : 'FAILED';
+            v1_status = dev < v1_limit ? 'PASS' : 'FAILED';
+            v2_status = dev < v2_limit ? 'PASS' : 'FAILED';
           }
 
 
           return (
 
             <View style={{
+
               paddingHorizontal: 10,
               paddingVertical: 5,
-              marginVertical: 2,
+              marginVertical: 10,
 
             }}>
               <View style={{
                 flex: 1,
                 padding: 5,
               }}>
-                <Text style={{
-                  fontFamily: fonts.secondary[600],
-                  fontSize: 12
-                }}>{item.label}</Text>
+
+                {index + 1 == 1 &&
+                  <View style={{
+                    flexDirection: 'row',
+                    height: 18,
+                  }}>
+                    <View style={{ justifyContent: 'flex-start' }}>
+                      <Text style={{ fontFamily: fonts.secondary[600], fontSize: 14, }}>
+                        CH
+                      </Text>
+                    </View>
+                    <View style={{ justifyContent: 'flex-end' }}>
+                      <Text style={{ fontFamily: fonts.secondary[600], fontSize: 10, }}>4</Text>
+                    </View>
+
+
+                  </View>
+
+                }
+
+                {index + 1 == 2 &&
+                  <View style={{
+                    flexDirection: 'row',
+                    height: 18,
+                  }}>
+                    <View style={{ justifyContent: 'flex-start' }}>
+                      <Text style={{ fontFamily: fonts.secondary[600], fontSize: 14, }}>
+                        CO
+                      </Text>
+                    </View>
+                    <View style={{ justifyContent: 'flex-end' }}>
+                      <Text style={{ fontFamily: fonts.secondary[600], fontSize: 10, }}>2</Text>
+                    </View>
+
+
+                  </View>
+
+                }
+
+                {index + 1 == 3 &&
+                  <View style={{
+                    flexDirection: 'row',
+                    height: 18,
+                  }}>
+                    <View style={{ justifyContent: 'flex-start' }}>
+                      <Text style={{ fontFamily: fonts.secondary[600], fontSize: 14, }}>
+                        N
+                      </Text>
+                    </View>
+                    <View style={{ justifyContent: 'flex-end' }}>
+                      <Text style={{ fontFamily: fonts.secondary[600], fontSize: 10, }}>2</Text>
+                    </View>
+
+
+                  </View>
+
+                }
+
+                {index + 1 == 4 &&
+                  <View style={{
+                    flexDirection: 'row',
+                    height: 18,
+                  }}>
+                    <View style={{ justifyContent: 'flex-start' }}>
+                      <Text style={{ fontFamily: fonts.secondary[600], fontSize: 14, }}>
+                        C
+                      </Text>
+                    </View>
+                    <View style={{ justifyContent: 'flex-end' }}>
+                      <Text style={{ fontFamily: fonts.secondary[600], fontSize: 10, }}>2</Text>
+                    </View>
+                    <View style={{ justifyContent: 'flex-start' }}>
+                      <Text style={{ fontFamily: fonts.secondary[600], fontSize: 14, }}>
+                        C
+                      </Text>
+                    </View>
+                    <View style={{ justifyContent: 'flex-end' }}>
+                      <Text style={{ fontFamily: fonts.secondary[600], fontSize: 10, }}>6</Text>
+                    </View>
+
+
+                  </View>
+
+                }
+
+                {index + 1 == 5 &&
+                  <View style={{
+                    flexDirection: 'row',
+                    height: 18,
+                  }}>
+                    <View style={{ justifyContent: 'flex-start' }}>
+                      <Text style={{ fontFamily: fonts.secondary[600], fontSize: 14, }}>
+                        C
+                      </Text>
+                    </View>
+                    <View style={{ justifyContent: 'flex-end' }}>
+                      <Text style={{ fontFamily: fonts.secondary[600], fontSize: 10, }}>3</Text>
+                    </View>
+                    <View style={{ justifyContent: 'flex-start' }}>
+                      <Text style={{ fontFamily: fonts.secondary[600], fontSize: 14, }}>
+                        C
+                      </Text>
+                    </View>
+                    <View style={{ justifyContent: 'flex-end' }}>
+                      <Text style={{ fontFamily: fonts.secondary[600], fontSize: 10, }}>8</Text>
+                    </View>
+
+
+                  </View>
+
+                }
+
+                {index + 1 == 6 &&
+                  <View style={{
+                    flexDirection: 'row',
+                    height: 18,
+                  }}>
+                    <View style={{ justifyContent: 'flex-start' }}>
+                      <Text style={{ fontFamily: fonts.secondary[600], fontSize: 14, }}>
+                        i-C
+                      </Text>
+                    </View>
+                    <View style={{ justifyContent: 'flex-end' }}>
+                      <Text style={{ fontFamily: fonts.secondary[600], fontSize: 10, }}>4</Text>
+                    </View>
+                    <View style={{ justifyContent: 'flex-start' }}>
+                      <Text style={{ fontFamily: fonts.secondary[600], fontSize: 14, }}>
+                        C
+                      </Text>
+                    </View>
+                    <View style={{ justifyContent: 'flex-end' }}>
+                      <Text style={{ fontFamily: fonts.secondary[600], fontSize: 10, }}>10</Text>
+                    </View>
+
+
+                  </View>
+
+                }
+
+                {index + 1 == 7 &&
+                  <View style={{
+                    flexDirection: 'row',
+                    height: 18,
+                  }}>
+                    <View style={{ justifyContent: 'flex-start' }}>
+                      <Text style={{ fontFamily: fonts.secondary[600], fontSize: 14, }}>
+                        n-C
+                      </Text>
+                    </View>
+                    <View style={{ justifyContent: 'flex-end' }}>
+                      <Text style={{ fontFamily: fonts.secondary[600], fontSize: 10, }}>4</Text>
+                    </View>
+                    <View style={{ justifyContent: 'flex-start' }}>
+                      <Text style={{ fontFamily: fonts.secondary[600], fontSize: 14, }}>
+                        C
+                      </Text>
+                    </View>
+                    <View style={{ justifyContent: 'flex-end' }}>
+                      <Text style={{ fontFamily: fonts.secondary[600], fontSize: 10, }}>10</Text>
+                    </View>
+
+
+                  </View>
+
+                }
+
+                {index + 1 == 8 &&
+                  <View style={{
+                    flexDirection: 'row',
+                    height: 18,
+                  }}>
+                    <View style={{ justifyContent: 'flex-start' }}>
+                      <Text style={{ fontFamily: fonts.secondary[600], fontSize: 14, }}>
+                        i-C
+                      </Text>
+                    </View>
+                    <View style={{ justifyContent: 'flex-end' }}>
+                      <Text style={{ fontFamily: fonts.secondary[600], fontSize: 10, }}>5</Text>
+                    </View>
+                    <View style={{ justifyContent: 'flex-start' }}>
+                      <Text style={{ fontFamily: fonts.secondary[600], fontSize: 14, }}>
+                        C
+                      </Text>
+                    </View>
+                    <View style={{ justifyContent: 'flex-end' }}>
+                      <Text style={{ fontFamily: fonts.secondary[600], fontSize: 10, }}>12</Text>
+                    </View>
+
+
+                  </View>
+
+                }
+
+                {index + 1 == 9 &&
+                  <View style={{
+                    flexDirection: 'row',
+                    height: 18,
+                  }}>
+                    <View style={{ justifyContent: 'flex-start' }}>
+                      <Text style={{ fontFamily: fonts.secondary[600], fontSize: 14, }}>
+                        n-C
+                      </Text>
+                    </View>
+                    <View style={{ justifyContent: 'flex-end' }}>
+                      <Text style={{ fontFamily: fonts.secondary[600], fontSize: 10, }}>5</Text>
+                    </View>
+                    <View style={{ justifyContent: 'flex-start' }}>
+                      <Text style={{ fontFamily: fonts.secondary[600], fontSize: 14, }}>
+                        C
+                      </Text>
+                    </View>
+                    <View style={{ justifyContent: 'flex-end' }}>
+                      <Text style={{ fontFamily: fonts.secondary[600], fontSize: 10, }}>12</Text>
+                    </View>
+
+
+                  </View>
+
+                }
+                {index + 1 == 10 &&
+                  <View style={{
+                    flexDirection: 'row',
+                    height: 18,
+                  }}>
+                    <View style={{ justifyContent: 'flex-start' }}>
+                      <Text style={{ fontFamily: fonts.secondary[600], fontSize: 14, }}>
+                        C
+                      </Text>
+                    </View>
+                    <View style={{ justifyContent: 'flex-end' }}>
+                      <Text style={{ fontFamily: fonts.secondary[600], fontSize: 10, }}>6</Text>
+                    </View>
+                    <View style={{ justifyContent: 'flex-start' }}>
+                      <Text style={{ fontFamily: fonts.secondary[600], fontSize: 14, }}>
+                        +
+                      </Text>
+                    </View>
+
+
+                  </View>
+
+                }
+
+
               </View>
 
               <View style={{
                 flexDirection: 'row',
                 justifyContent: 'space-around'
               }}>
-                <View style={{
-                  flex: 1,
-                  marginRight: 2,
-                }}>
-                  <TextInput value={item.value1.toString()} onEndEditing={x => {
+                {!mulai && <>
 
-                    if (x.nativeEvent.text == 0) {
+                  <View style={{
+                    flex: 1,
+                    marginRight: 2,
+                  }}>
+                    <TextInput value={item.value1.toString()} onEndEditing={x => {
+
+                      if (x.nativeEvent.text == 0) {
+                        let newArr = [...data];
+                        newArr[index] = {
+                          label: newArr[index].label,
+                          value1: 0,
+                          value2: newArr[index].value2
+                        }
+                        setData(newArr)
+                      }
+                    }} onChangeText={x => {
+
                       let newArr = [...data];
                       newArr[index] = {
                         label: newArr[index].label,
-                        value1: 0,
+                        value1: x,
                         value2: newArr[index].value2
                       }
+
+
                       setData(newArr)
-                    }
-                  }} onChangeText={x => {
 
-                    let newArr = [...data];
-                    newArr[index] = {
-                      label: newArr[index].label,
-                      value1: x,
-                      value2: newArr[index].value2
-                    }
+                    }} keyboardType='number-pad' style={{
+                      backgroundColor: colors.tertiary,
+                      fontFamily: fonts.secondary[600],
+                      fontSize: 15,
+                      textAlign: 'center',
+                      color: colors.black
 
+                    }} />
+                  </View>
+                  <View style={{
+                    marginLeft: 2,
+                    marginRight: 2,
+                    flex: 1,
+                  }}>
+                    <TextInput onEndEditing={x => {
 
-                    setData(newArr)
-
-                  }} keyboardType='number-pad' style={{
-                    backgroundColor: colors.tertiary,
-                    fontFamily: fonts.secondary[600],
-                    fontSize: 15,
-                    textAlign: 'center'
-                  }} />
-                </View>
-                <View style={{
-                  marginLeft: 2,
-                  marginRight: 2,
-                  flex: 1,
-                }}>
-                  <TextInput onEndEditing={x => {
-
-                    if (x.nativeEvent.text == 0) {
+                      if (x.nativeEvent.text == 0) {
+                        let newArr = [...data];
+                        newArr[index] = {
+                          label: newArr[index].label,
+                          value2: 0,
+                          value1: newArr[index].value1
+                        }
+                        setData(newArr)
+                      }
+                    }} onChangeText={x => {
                       let newArr = [...data];
                       newArr[index] = {
                         label: newArr[index].label,
-                        value2: 0,
+                        value2: x,
                         value1: newArr[index].value1
                       }
                       setData(newArr)
-                    }
-                  }} onChangeText={x => {
-                    let newArr = [...data];
-                    newArr[index] = {
-                      label: newArr[index].label,
-                      value2: x,
-                      value1: newArr[index].value1
-                    }
-                    setData(newArr)
 
-                  }} value={item.value2.toString()} keyboardType='number-pad' style={{
-                    backgroundColor: colors.tertiary,
-                    fontFamily: fonts.secondary[600],
-                    fontSize: 15,
-                    textAlign: 'center'
-                  }} />
-                </View>
+                    }} value={item.value2.toString()} keyboardType='number-pad' style={{
+                      backgroundColor: colors.tertiary,
+                      fontFamily: fonts.secondary[600],
+                      color: colors.black,
+                      fontSize: 15,
+                      textAlign: 'center'
+                    }} />
+                  </View>
+                </>}
 
-                <View style={{
-                  flex: 1,
-                  marginLeft: 2,
-                  marginRight: 2,
-                  backgroundColor: v1_status == 'PASS' ? colors.success : colors.danger,
-                  justifyContent: 'center',
-                  alignItems: 'center'
-                }}>
-                  <Text style={{
-                    fontFamily: fonts.secondary[600],
-                    fontSize: 15,
+                {mulai && <>
 
-                    color: colors.white,
-                    paddingHorizontal: 10,
-                    borderRadius: 10,
-                    textAlign: 'center'
-                  }}>{v1_status}</Text>
-                </View>
-                <View style={{
-                  flex: 1,
-                  marginLeft: 2,
-                  backgroundColor: v2_status == 'PASS' ? colors.success : colors.danger,
-                  justifyContent: 'center',
-                  alignItems: 'center'
-                }}>
-                  <Text style={{
-                    fontFamily: fonts.secondary[600],
-                    fontSize: 15,
-                    color: colors.white,
-                    paddingHorizontal: 10,
-                    borderRadius: 10,
-                    textAlign: 'center'
-                  }}>{v2_status}</Text>
-                </View>
+                  <View style={{
+                    flex: 1,
+                    height: 40,
+                    marginLeft: 2,
+                    marginRight: 2,
+                    backgroundColor: v1_status == 'PASS' ? colors.success : colors.danger,
+                    justifyContent: 'center',
+                    alignItems: 'center'
+                  }}>
+                    <Text style={{
+                      fontFamily: fonts.secondary[600],
+                      fontSize: 15,
+
+                      color: colors.white,
+                      paddingHorizontal: 10,
+                      borderRadius: 10,
+                      textAlign: 'center'
+                    }}>{v1_status}</Text>
+                  </View>
+                  <View style={{
+                    flex: 1,
+                    marginLeft: 2,
+                    backgroundColor: v2_status == 'PASS' ? colors.success : colors.danger,
+                    justifyContent: 'center',
+                    alignItems: 'center'
+                  }}>
+                    <Text style={{
+                      fontFamily: fonts.secondary[600],
+                      fontSize: 15,
+                      color: colors.white,
+                      paddingHorizontal: 10,
+                      borderRadius: 10,
+                      textAlign: 'center'
+                    }}>{v2_status}</Text>
+                  </View>
+                </>}
               </View>
 
             </View>
           )
         })}
 
-        <View style={{ paddingHorizontal: 10, paddingVertical: 5, marginVertical: 2, }}>
-          <View style={{ flex: 1, padding: 5, }}>
-            <Text style={{ fontFamily: fonts.secondary[600], fontSize: 12 }}>Pressure Base (psia)</Text>
-          </View>
-          <View style={{ flexDirection: 'row', }}>
-            <View style={{ flex: 0.5, marginRight: 2 }}>
-              <TextInput value={PSIA.toString()} keyboardType='number-pad' style={{
-                backgroundColor: colors.tertiary, fontFamily: fonts.secondary[600], fontSize: 15, textAlign: 'center'
-              }} />
-              <Text style={{
-                fontFamily: fonts.secondary[400],
-                fontSize: 10,
-                color: colors.black
-              }}>Pressure Base according SE DITJEN MIGAS No: 1999/18.06/DMT/2013 at 14.73 psia</Text>
+        {!mulai && <>
+          <View style={{ paddingHorizontal: 10, paddingVertical: 5, marginVertical: 2, }}>
+            <View style={{ flex: 1, padding: 5, }}>
+              <Text style={{ fontFamily: fonts.secondary[600], fontSize: 12 }}>Pressure Base (psia)</Text>
+            </View>
+            <View style={{ flexDirection: 'row', }}>
+              <View style={{ flex: 0.5, marginRight: 2 }}>
+                <TextInput value={parseFloat(PSIA).toString()} onChangeText={x => {
+                  setPSIA(x)
+                }} keyboardType='number-pad' style={{
+                  backgroundColor: colors.tertiary, fontFamily: fonts.secondary[600], fontSize: 15, textAlign: 'center'
+                }} />
+                <Text style={{
+                  fontFamily: fonts.secondary[400],
+                  fontSize: 10,
+                  color: colors.black
+                }}>Pressure Base according SE DITJEN MIGAS No: 1999/18.06/DMT/2013 at 14.73 psia</Text>
+              </View>
             </View>
           </View>
-        </View>
+        </>}
 
-        <View style={{ paddingHorizontal: 10, paddingVertical: 5, marginVertical: 2, }}>
-          <View style={{ flex: 1, padding: 5, }}>
-            <Text style={{ fontFamily: fonts.secondary[600], fontSize: 12 }}>Gross Heat Value Real (Btu/Scf)</Text>
-          </View>
-          <View style={{ flexDirection: 'row', width: '51%' }}>
-            <View style={{
-              flex: 1, marginRight: 2, height: 48,
-              justifyContent: 'center',
-              alignItems: 'center',
-              backgroundColor: colors.tertiary,
-            }}>
-              <Text style={{ fontFamily: fonts.secondary[600], fontSize: 15, textAlign: 'center' }}>
-                {GHVReal.value1.toString()}
-              </Text>
-            </View>
-            <View style={{
-              flex: 1, marginLeft: 2, height: 48,
-              justifyContent: 'center',
-              alignItems: 'center',
-              backgroundColor: colors.tertiary,
-            }}>
-              <Text style={{ fontFamily: fonts.secondary[600], fontSize: 15, textAlign: 'center' }}>
-                {GHVReal.value2.toString()}
-              </Text>
-            </View>
-          </View>
-        </View>
+        {mulai && <>
 
-        <View style={{ paddingHorizontal: 10, paddingVertical: 5, marginVertical: 2, }}>
-          <View style={{ flex: 1, padding: 5, }}>
-            <Text style={{ fontFamily: fonts.secondary[600], fontSize: 12 }}>Gross Heat Value Ideal (Btu/Scf)</Text>
-          </View>
-          <View style={{ flexDirection: 'row', width: '51%' }}>
-            <View style={{
-              flex: 1, marginRight: 2, height: 48,
-              justifyContent: 'center',
-              alignItems: 'center',
-              backgroundColor: colors.tertiary,
-            }}>
-              <Text style={{ fontFamily: fonts.secondary[600], fontSize: 15, textAlign: 'center' }}>
-                {GHVIdeal.value1.toString()}
-              </Text>
+          <View style={{ paddingHorizontal: 10, paddingVertical: 5, marginVertical: 2, }}>
+            <View style={{ flex: 1, padding: 5, }}>
+              <Text style={{ fontFamily: fonts.secondary[600], fontSize: 12 }}>Gross Heat Value Real (Btu/Scf)</Text>
             </View>
-            <View style={{
-              flex: 1, marginLeft: 2, height: 48,
-              justifyContent: 'center',
-              alignItems: 'center',
-              backgroundColor: colors.tertiary,
-            }}>
-              <Text style={{ fontFamily: fonts.secondary[600], fontSize: 15, textAlign: 'center' }}>
-                {GHVIdeal.value2.toString()}
-              </Text>
+            <View style={{ flexDirection: 'row', width: '100%' }}>
+              <View style={{
+                flex: 1, marginRight: 2, height: 48,
+                justifyContent: 'center',
+                alignItems: 'center',
+                backgroundColor: colors.tertiary,
+              }}>
+                <Text style={{ fontFamily: fonts.secondary[600], fontSize: 15, textAlign: 'center' }}>
+                  {GHVReal.value1.toString()}
+                </Text>
+              </View>
+              <View style={{
+                flex: 1, marginLeft: 2, height: 48,
+                justifyContent: 'center',
+                alignItems: 'center',
+                backgroundColor: colors.tertiary,
+              }}>
+                <Text style={{ fontFamily: fonts.secondary[600], fontSize: 15, textAlign: 'center' }}>
+                  {GHVReal.value2.toString()}
+                </Text>
+              </View>
             </View>
           </View>
-        </View>
 
-        <View style={{ paddingHorizontal: 10, paddingVertical: 5, marginVertical: 2, }}>
-          <View style={{ flex: 1, padding: 5, }}>
-            <Text style={{ fontFamily: fonts.secondary[600], fontSize: 12 }}>Compressibility Factor</Text>
-          </View>
-          <View style={{ flexDirection: 'row', width: '51%' }}>
-            <View style={{
-              flex: 1, marginRight: 2, height: 48,
-              justifyContent: 'center',
-              alignItems: 'center',
-              backgroundColor: colors.tertiary,
-            }}>
-              <Text style={{ fontFamily: fonts.secondary[600], fontSize: 15, textAlign: 'center' }}>
-                {CF.value1.toString()}
-              </Text>
+          <View style={{ paddingHorizontal: 10, paddingVertical: 5, marginVertical: 2, }}>
+            <View style={{ flex: 1, padding: 5, }}>
+              <Text style={{ fontFamily: fonts.secondary[600], fontSize: 12 }}>Gross Heat Value Ideal (Btu/Scf)</Text>
             </View>
-            <View style={{
-              flex: 1, marginLeft: 2, height: 48,
-              justifyContent: 'center',
-              alignItems: 'center',
-              backgroundColor: colors.tertiary,
-            }}>
-              <Text style={{ fontFamily: fonts.secondary[600], fontSize: 15, textAlign: 'center' }}>
-                {CF.value2.toString()}
-              </Text>
+            <View style={{ flexDirection: 'row', width: '100%' }}>
+              <View style={{
+                flex: 1, marginRight: 2, height: 48,
+                justifyContent: 'center',
+                alignItems: 'center',
+                backgroundColor: colors.tertiary,
+              }}>
+                <Text style={{ fontFamily: fonts.secondary[600], fontSize: 15, textAlign: 'center' }}>
+                  {GHVIdeal.value1.toString()}
+                </Text>
+              </View>
+              <View style={{
+                flex: 1, marginLeft: 2, height: 48,
+                justifyContent: 'center',
+                alignItems: 'center',
+                backgroundColor: colors.tertiary,
+              }}>
+                <Text style={{ fontFamily: fonts.secondary[600], fontSize: 15, textAlign: 'center' }}>
+                  {GHVIdeal.value2.toString()}
+                </Text>
+              </View>
             </View>
           </View>
-        </View>
 
-        <View style={{ paddingHorizontal: 10, paddingVertical: 5, marginVertical: 2, }}>
-          <View style={{ flex: 1, padding: 5, }}>
-            <Text style={{ fontFamily: fonts.secondary[600], fontSize: 12 }}>Relative Density</Text>
-          </View>
-          <View style={{ flexDirection: 'row', width: '51%' }}>
-            <View style={{
-              flex: 1, marginRight: 2, height: 48,
-              justifyContent: 'center',
-              alignItems: 'center',
-              backgroundColor: colors.tertiary,
-            }}>
-              <Text style={{ fontFamily: fonts.secondary[600], fontSize: 15, textAlign: 'center' }}>
-                {RD.value1.toString()}
-              </Text>
+          <View style={{ paddingHorizontal: 10, paddingVertical: 5, marginVertical: 2, }}>
+            <View style={{ flex: 1, padding: 5, }}>
+              <Text style={{ fontFamily: fonts.secondary[600], fontSize: 12 }}>Compressibility Factor</Text>
             </View>
-            <View style={{
-              flex: 1, marginLeft: 2, height: 48,
-              justifyContent: 'center',
-              alignItems: 'center',
-              backgroundColor: colors.tertiary,
-            }}>
-              <Text style={{ fontFamily: fonts.secondary[600], fontSize: 15, textAlign: 'center' }}>
-                {RD.value2.toString()}
-              </Text>
+            <View style={{ flexDirection: 'row', width: '100%' }}>
+              <View style={{
+                flex: 1, marginRight: 2, height: 48,
+                justifyContent: 'center',
+                alignItems: 'center',
+                backgroundColor: colors.tertiary,
+              }}>
+                <Text style={{ fontFamily: fonts.secondary[600], fontSize: 15, textAlign: 'center' }}>
+                  {CF.value1.toString()}
+                </Text>
+              </View>
+              <View style={{
+                flex: 1, marginLeft: 2, height: 48,
+                justifyContent: 'center',
+                alignItems: 'center',
+                backgroundColor: colors.tertiary,
+              }}>
+                <Text style={{ fontFamily: fonts.secondary[600], fontSize: 15, textAlign: 'center' }}>
+                  {CF.value2.toString()}
+                </Text>
+              </View>
             </View>
           </View>
-        </View>
+
+          <View style={{ paddingHorizontal: 10, paddingVertical: 5, marginVertical: 2, }}>
+            <View style={{ flex: 1, padding: 5, }}>
+              <Text style={{ fontFamily: fonts.secondary[600], fontSize: 12 }}>Relative Density</Text>
+            </View>
+            <View style={{ flexDirection: 'row', width: '100%' }}>
+              <View style={{
+                flex: 1, marginRight: 2, height: 48,
+                justifyContent: 'center',
+                alignItems: 'center',
+                backgroundColor: colors.tertiary,
+              }}>
+                <Text style={{ fontFamily: fonts.secondary[600], fontSize: 15, textAlign: 'center' }}>
+                  {RD.value1.toString()}
+                </Text>
+              </View>
+              <View style={{
+                flex: 1, marginLeft: 2, height: 48,
+                justifyContent: 'center',
+                alignItems: 'center',
+                backgroundColor: colors.tertiary,
+              }}>
+                <Text style={{ fontFamily: fonts.secondary[600], fontSize: 15, textAlign: 'center' }}>
+                  {RD.value2.toString()}
+                </Text>
+              </View>
+            </View>
+          </View>
+        </>}
 
 
 
 
         <MyGap jarak={20} />
 
-        <MyButton Icons="refresh" title="Calculate" warna={colors.primary} onPress={__calculate}
-        />
+        {!mulai && !loading && <MyButton Icons="download" title="Calculate" warna={colors.primary} onPress={__calculate}
+        />}
+
+        {mulai && !loading && <MyButton Icons="refresh" title="Re-Calculate" warna={colors.secondary} onPress={() => {
+          setLoading(true);
+          setTimeout(() => {
+            setMulai(false);
+            setData(NULL_DATA)
+            setLoading(false)
+          }, 500)
+        }}
+        />}
+
+        {loading && <ActivityIndicator size="large" color={colors.primary} />}
+
+
 
 
         <MyGap jarak={50} />

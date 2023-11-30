@@ -533,13 +533,7 @@ export default function Home({ navigation }) {
 
           return (
 
-            <View style={{
-
-              paddingHorizontal: 10,
-              paddingVertical: 5,
-              marginVertical: 10,
-
-            }}>
+            <View style={{ paddingHorizontal: 10, paddingVertical: 5, marginVertical: 10, }}>
               <View style={{
                 flex: 1,
                 padding: 5,
